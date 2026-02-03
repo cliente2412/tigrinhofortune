@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fortune Tiger — Demo</title>
+
+<style>
+:root{
+  --gold:#ffcc00;
+  --bg1:#12001f;
+  --bg2:#000814;
+  --card:#0b0f2a;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:
+    radial-gradient(circle at top, #2a0040, var(--bg2)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,204,0,.03),
+      rgba(255,204,0,.03) 10px,
+      transparent 10px,
+      transparent 20px
+    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+
+.card{
+  width:min(92vw,400px);
+  background:linear-gradient(180deg,#0f143a,var(--card));
+  border-radius:22px;
+  padding:22px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+}
+
+.badge{
+  display:inline-block;
+  background:linear-gradient(135deg,#ffd700,#ff9900);
+  color:#000;
+  font-weight:900;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:.75rem;
+  margin-bottom:10px;
+}
+
+h1{
+  margin:.3em 0;
+  font-size:1.5rem;
+  letter-spacing:.5px;
+}
+
+.notice{
+  font-size:.8rem;
+  opacity:.8;
+  margin-bottom:14px;
+}
+
+.balance{
+  margin:10px 0;
+  font-size:1.15rem;
+  font-weight:700;
+}
+
+.slots{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:16px 0;
+}
+
+.slot{
+  height:78px;
+  border-radius:16px;
+  background:radial-gradient(circle at top,#1a1f55,#050817);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2.4rem;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.8);
+}
+
+button{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  font-weight:900;
+  font-size:1rem;
+  background:linear-gradient(135deg,#ffe066,#ff9900);
+  color:#000;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+#winText{
+  display:none;
+  margin-top:8px;
+  font-weight:900;
+  color:var(--gold);
+  animation:pulse .8s infinite;
+}
+
+.footer{
+  margin-top:10px;
+  font-size:.75rem;
+  opacity:.7;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.08)}
+  100%{transform:scale(1)}
+}
+</style>
+</head>
+
+<body>
+
+<!-- TELA INICIAL -->
+<div class="card" id="start">
+  <span class="badge">DEMO</span>
+  <h1>Fortune Tiger</h1>
+  <p class="notice">Jogo estilo cassino • moeda virtual</p>
+  <button onclick="startGame()">Entrar no jogo</button>
+  <div class="footer">Projeto Web</div>
+</div>
+
+<!-- JOGO -->
+<div class="card" id="game" style="display:none">
+  <span class="badge">CASSINO</span>
+  <h1>Fortune Tiger</h1>
+
+  <div class="balance">
+    💰 Coins: <span id="coins">100</span>
+  </div>
+
+  <div class="slots">
+    <div class="slot">🐯</div>
+    <div class="slot">🐯</div>
+    <div class="slot">🐯</div>
+  </div>
+
+  <div id="winText">VOCÊ GANHOU!</div>
+
+  <button id="spinBtn" onclick="spin()">Girar</button>
+
+  <div class="footer">
+    Giros restantes: <span id="spins">5</span>
+  </div>
+</div>
+
+<script>
+let coins = 100;
+let spins = 5;
+
+const symbols = ['🐯','🍒','⭐','💎','🍀','7️⃣','🍉','🔔'];
+
+function startGame(){
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+}
+
+function spin(){
+  if(spins <= 0) return;
+
+  spins--;
+  document.getElementById('spins').textContent = spins;
+  document.getElementById('winText').style.display = 'none';
+
+  const slots = document.querySelectorAll('.slot');
+  let count = 0;
+
+  const interval = setInterval(()=>{
+    slots.forEach(s=>{
+      s.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    });
+    count++;
+
+    if(count > 15){
+      clearInterval(interval);
+
+      // chance simples de vitória
+      const win = Math.random() < 0.35;
+
+      if(win){
+        slots.forEach(s => s.textContent = '🐯');
+        coins += 50;
+        document.getElementById('winText').style.display = 'block';
+      }else{
+        coins -= 10;
+        if(coins < 0) coins = 0;
+      }
+
+      document.getElementById('coins').textContent = coins;
+
+      if(spins === 0){
+        document.getElementById('spinBtn').disabled = true;
+      }
+    }
+  },100);
+}
+</script>
+
+</body>
+</html>
